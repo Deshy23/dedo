@@ -50,7 +50,7 @@ class DeformRobotEnv(DeformEnv):
         res = super(DeformRobotEnv, self).load_objects(sim, args, debug)
         data_path = os.path.join(os.path.split(__file__)[0], '..', 'data')
         sim.setAdditionalSearchPath(data_path)
-        robot_info = ROBOT_INFO.get(f'franka{self.num_anchors:d}', None)
+        robot_info = ROBOT_INFO.get(f'fetch{self.num_anchors:d}', None)
         robot_path = os.path.join(data_path, 'robots',
                                   robot_info['file_name'])
         if debug:
@@ -79,14 +79,13 @@ class DeformRobotEnv(DeformEnv):
             DEFORM_INFO, self.deform_obj, 'deform_anchor_vertices')
         _, mesh = get_mesh_data(self.sim, self.deform_id)
         assert (preset_dynamic_anchor_vertices is not None)
-        for i in range(self.num_anchors):  # make anchors
+        for i in range(0):  # make anchors
             anchor_pos = np.array(mesh[preset_dynamic_anchor_vertices[i][0]])
             if not np.isfinite(anchor_pos).all():
                 print('anchor_pos not sane:', anchor_pos)
                 input('Press enter to exit')
                 exit(1)
-            link_id = self.robot.info.ee_link_id if i == 0 else \
-                self.robot.info.left_ee_link_id
+            link_id = self.robot.info.ee_link_id
             self.sim.createSoftBodyAnchor(
                 self.deform_id, preset_dynamic_anchor_vertices[i][0],
                 self.robot.info.robot_id, link_id)

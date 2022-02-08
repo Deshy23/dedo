@@ -106,10 +106,10 @@ class BulletManipulator:
         # loading, but it looks okay to keep balance of the platform and could
         # allow us to move the basis as the VR pybullet example.
         self.base_cid = None
-        if not use_fixed_base:
+        if not use_fixed_base:                    
             self.base_cid = sim.createConstraint(
-                self.info.robot_id, -1, -1, -1, sim.JOINT_FIXED, [0.0, 0, 0],
-                [0.0, 0, 0], base_pos)
+                parentBodyUniqueId=self.info.robot_id, parentLinkIndex=-1, childBodyUniqueId=-1, childLinkIndex=-1, jointType=sim.JOINT_FIXED, jointAxis=[0.0, 0, 0],
+                parentFramePosition=[0.0, 0, 0], childFramePosition=base_pos)
 
         # Reset to initial position and visualize.
         self.rest_qpos = (self.info.joint_maxpos+self.info.joint_minpos)/2
@@ -148,7 +148,7 @@ class BulletManipulator:
                 pybullet.getJointInfo(robot_id, j)
             jname = jname.decode("utf-8")
             link_name = link_name.decode("utf-8")
-            # print('load jname', jname, 'jtype', jtype, 'link_name', link_name)
+            #print('load jname', jname, 'jtype', jtype, 'link_name', link_name)
             if jtype in [pybullet.JOINT_REVOLUTE, pybullet.JOINT_PRISMATIC]:
                 joint_ids.append(j)
                 joint_names.append(jname)
@@ -564,7 +564,7 @@ class BulletManipulator:
             self.info.robot_id, 0, computeLinkVelocity=0)
         base_pos = base_state[0]
         base_quat = base_state[1]
-        # print(base_pos, base_quat)
+        print(base_pos, base_quat)
         # delta_quat = self.sim.getQuaternionFromEuler([0, 0, rot_vel*dt])
         # tar_base_pos, tar_base_ori = self.sim.multiplyTransforms(base_pos,
         #     base_quat, [lin_vel[0] * dt, lin_vel[1] * dt, 0], delta_quat)
@@ -577,9 +577,45 @@ class BulletManipulator:
         next_base_ori = self.sim.getQuaternionFromEuler(next_base_ori.tolist())
         # User needs to specify dt since it is specified by the user so
         # better let user to track it.
-        # print(next_base_pos, next_base_ori)
+        #print(next_base_pos, next_base_ori)
         self.sim.changeConstraint(self.base_cid, next_base_pos, next_base_ori,
                                   maxForce=1000)
+        # self.sim.setJointMotorControlArray(
+        #     bodyIndex=self.info.robot_id, jointIndices=self.info.joint_ids,
+        #     controlMode=pybullet.POSITION_CONTROL, targetPosition=next_base_pos)
+        #vel = self.sim.calculateInverseKinematics(self.info.robot_id, 0, targetPosition = [0,0,0])
+        #self.sim.setJointMotorControl2(self.base_cid, 0, self.sim.VELOCITY_CONTROL, vel)
+        self.sim.setJointMotorControlArray(
+            bodyIndex=self.info.robot_id, jointIndices=self.info.joint_ids,
+            controlMode=pybullet.POSITION_CONTROL)
+        return
+    
+    def move_to_pos(self, gol_pos, gol_ori):
+        # Change fixed constraint spec to move the base: assuming the mobile
+        # base is omnidirectional, we can also animate differential drive by
+        # having the wheel distance.
+        assert(self.base_cid is not None)
+        base_state = self.sim.getLinkState(
+            self.info.robot_id, 0, computeLinkVelocity=0)
+        base_pos = base_state[0]
+        base_quat = base_state[1]
+        print(base_pos, base_quat)
+        # delta_quat = self.sim.getQuaternionFromEuler([0, 0, rot_vel*dt])
+        # tar_base_pos, tar_base_ori = self.sim.multiplyTransforms(base_pos,
+        #     base_quat, [lin_vel[0] * dt, lin_vel[1] * dt, 0], delta_quat)
+        # User needs to specify dt since it is specified by the user so
+        # better let user to track it.
+        #print(next_base_pos, next_base_ori)
+        self.sim.changeConstraint(self.base_cid, gol_pos, [0,0,gol_ori],
+                                  maxForce=100)
+        # self.sim.setJointMotorControlArray(
+        #     bodyIndex=self.info.robot_id, jointIndices=self.info.joint_ids,
+        #     controlMode=pybullet.POSITION_CONTROL, targetPosition=next_base_pos)
+        #vel = self.sim.calculateInverseKinematics(self.info.robot_id, 0, targetPosition = [0,0,0])
+        #self.sim.setJointMotorControl2(self.base_cid, 0, self.sim.VELOCITY_CONTROL, vel)
+        self.sim.setJointMotorControlArray(
+            bodyIndex=self.info.robot_id, jointIndices=self.info.joint_ids,
+            controlMode=pybullet.POSITION_CONTROL)
         return
 
 #

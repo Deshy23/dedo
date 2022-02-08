@@ -143,7 +143,7 @@ SCENE_INFO = {
             },
 
         },
-        'goal_pos': [[0, 0.00, 8.2]],
+        'goal_pos': [[0, 0, 8]],
     },
     'button': {
         'entities': {
@@ -606,7 +606,7 @@ DEFORM_INFO = {
 
     },
     'cloth/apron_0.obj': {
-        'deform_init_pos': [0, 5, 8],
+        'deform_init_pos': [2, -0.5, 4],
         'deform_init_ori': [np.pi / 2, 0, np.pi],
         'deform_scale': 3,
         'deform_elastic_stiffness': 50,
@@ -1320,6 +1320,34 @@ DEFAULT_CAM_PROJECTION = {
 }
 
 ROBOT_INFO = {
+    'fetch2' :{
+        'file_name': 'fetch/fetch.urdf',
+        'ee_joint_name': 'gripper_axis',
+        'ee_link_name': 'gripper_link',
+        'left_ee_joint_name': 'l_gripper_finger_joint',
+        'left_ee_link_name': 'l_gripper_finger_link',
+        'global_scaling': 7.5,
+        'use_fixed_base': False,
+        'base_pos': np.array([5, 1.5, 0]),
+        'rest_arm_qpos': np.array(
+            [0,1,0,0,0,0,0]),
+        'left_rest_arm_qpos': np.array(
+            []),
+    },
+    'fetch1' :{
+        'file_name': 'fetch/fetch.urdf',
+        'ee_joint_name': 'r_gripper_finger_joint',
+        'ee_link_name': 'r_gripper_finger_link',
+        'left_ee_joint_name': 'l_gripper_finger_joint',
+        'left_ee_link_name': 'l_gripper_finger_link',
+        'global_scaling': 10.0,
+        'use_fixed_base': True,
+        'base_pos': np.array([5.0, 1.5, 0]),
+        'rest_arm_qpos': np.array(
+            # for [2.5, 1.5, 1.0]
+            [0.4083, 0.4691, -0.6216, -2.9606, -0.9926, 3.4903, 1.5129]
+        ),
+    },
     'franka2': {
         'file_name': 'franka/franka_dual.urdf',
         'ee_joint_name': 'panda_joint7_r',

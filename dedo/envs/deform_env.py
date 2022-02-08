@@ -319,9 +319,11 @@ class DeformEnv(gym.Env):
             assert self.action_space.contains(action)
             assert ((np.abs(action) <= 1.0).all()), 'action must be in [-1, 1]'
         action = action.reshape(self.num_anchors, -1)
-
         # Step through physics simulation.
+
         for sim_step in range(self.args.sim_steps_per_action):
+            #self.robot.move_to_pos([100, 2,1], 1, dt = 1)
+            #self.robot.move_base([1000,0,0], 0, dt = 1)
             self.do_action(action, unscaled)
             self.sim.stepSimulation()
 

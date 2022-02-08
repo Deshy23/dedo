@@ -104,12 +104,11 @@ def play(env, num_episodes, args):
         gif_frames = []
         rwds = []
         print(f'# {args.env}:')
-
         while True:
+            #print('ee_pos:', env.robot.get_ee_pos())
             assert (not isinstance(env.action_space, gym.spaces.Discrete))
 
             act = traj[step] if step < len(traj) else last_action
-
             next_obs, rwd, done, info = env.step(act, unscaled=True)
             rwds.append(rwd)
 
